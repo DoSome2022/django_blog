@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* 檔案室容器 */
+    .archive-container {
+        border-top: 5px solid #000;
+        padding-top: 20px;
+    }
+
+    /* 標題樣式：檔案櫃標籤 */
+    .archive-header {
+        font-family: var(--font-sans);
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+    }
+
+    .archive-header::before {
+        content: "📂";
+        margin-right: 10px;
+        font-size: 1.5rem;
+    }
+
+    .archive-header span {
+        background: #000;
+        color: #fff;
+        padding: 5px 15px;
+    }
+
+    /* 單個檔案卷宗 (取代原本的 Card) */
+    .file-dossier {
+        background-color: #fdfbf7; /* 米黃色紙張 */
+        border: 1px solid #d1d5db;
+        border-left: 6px solid #555; /* 預設檔案脊背顏色 */
+        margin-bottom: 15px;
+        padding: 20px;
+        position: relative;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        font-family: var(--font-typewriter);
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
+        cursor: pointer;
+    }
+
+    /* 滑鼠懸停特效：抽出檔案 */
+    .file-dossier:hover {
+        transform: translateX(10px); /* 向右滑出 */
+        border-left-color: var(--cia-red); /* 脊背變紅，表示選中 */
+        box-shadow: 5px 5px 15px rgba(0,0,0,0.15);
+        background-color: #fff;
+    }
+
+    /* 連結樣式：去掉底線，讓整個標題像是一個標籤 */
+    .dossier-link {
+        color: #000;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 1.2rem;
+        display: block; /* 讓點擊區域變大 */
+    }
+
+    .dossier-link:hover {
+        color: var(--cia-blue);
+        text-decoration: underline;
+    }
+
+    /* 日期樣式：變成檔案編號的感覺 */
+    .dossier-meta {
+        font-size: 0.8rem;
+        color: #666;
+        margin-top: 5px;
+        font-family: var(--font-sans);
+        text-transform: uppercase;
+    }
+
+    /* 裝飾用的 "機密" 水印 */
+    .file-dossier::after {
+        content: "CONFIDENTIAL";
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 2rem;
+        color: rgba(0,0,0,0.03); /* 極淡 */
+        font-weight: 900;
+        pointer-events: none;
+        font-family: var(--font-sans);
+        z-index: 0;
+    }
+
+    /* 空狀態 */
+    .empty-state {
+        border: 2px dashed #999;
+        padding: 40px;
+        text-align: center;
+        color: #777;
+        font-family: var(--font-typewriter);
+        background-color: rgba(0,0,0,0.02);
+    }
+</style>
+
+<div class="archive-container">
+    <h2 class="archive-header">
+        <span>MASTER INDEX // 檔案總表</span>
+    </h2>
+
+    {% for post in posts %}
+        <div class="file-dossier">
+            <div class="card-body" style="position: relative; z-index: 1;">
+                <h3 class="card-title" style="margin: 0;">
+                    <a href="{% url 'post_detail' post.pk %}" class="dossier-link">
+                        📁 {{ post.title }}
+                    </a>
+                </h3>
+                <p class="dossier-meta">
+                    DATE FILED: {{ post.created_at|date:"Y-m-d H:i" }} | REF: #{{ post.pk }}
+                </p>
+            </div>
+        </div>
+    {% empty %}
+        <div class="empty-state">
+            [SYSTEM MESSAGE]: NO RECORDS FOUND IN DATABASE.<br>
+            ARCHIVES ARE EMPTY.
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

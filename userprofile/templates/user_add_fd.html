@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* CSO Theme CSS */
+    .cso-container {
+        background-color: #1a1a1a; /* 深灰底色 */
+        border: 2px solid #555;
+        width: 800px;
+        margin: 30px auto;
+        font-family: "Microsoft JhengHei", Arial, sans-serif;
+        color: #ddd;
+    }
+
+    /* 頂部橘色條 */
+    .cso-header {
+        background: linear-gradient(to bottom, #d47800, #a05000);
+        color: #fff;
+        padding: 10px 15px;
+        font-weight: bold;
+        border-bottom: 2px solid #000;
+        text-shadow: 1px 1px 2px #000;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .cso-body {
+        padding: 20px;
+        background: url('https://www.transparenttextures.com/patterns/dark-matter.png'); /* 增加一點材質感 */
+    }
+
+    /* 表單區塊 */
+    .cso-form-box {
+        background-color: #2a2a2a;
+        border: 1px solid #444;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .cso-label {
+        color: #f3c500; /* CSO 黃色 */
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .cso-input {
+        background-color: #000;
+        border: 1px solid #666;
+        color: #00ff00;
+        padding: 5px;
+        width: 200px;
+    }
+
+    .cso-btn {
+        background: linear-gradient(to bottom, #444, #222);
+        border: 1px solid #777;
+        color: #f3c500;
+        padding: 5px 20px;
+        cursor: pointer;
+        font-weight: bold;
+        margin-left: 10px;
+    }
+    .cso-btn:hover {
+        background: #555;
+        color: #fff;
+    }
+
+    /* 訊息提示 */
+    .cso-message {
+        padding: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #d47800;
+        background: rgba(212, 120, 0, 0.2);
+        color: #fff;
+    }
+
+    /* 好友列表區塊 */
+    .friend-list-header {
+        background-color: #333;
+        color: #f3c500;
+        padding: 5px 10px;
+        border-bottom: 1px solid #555;
+        margin-top: 20px;
+        font-size: 0.9em;
+    }
+
+    .friend-item {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #333;
+        transition: background 0.2s;
+    }
+    
+    .friend-item:hover {
+        background-color: #333;
+    }
+
+    .friend-avatar {
+        width: 40px;
+        height: 40px;
+        background-color: #000;
+        border: 1px solid #555;
+        margin-right: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8em;
+        color: #666;
+    }
+    
+    .friend-info {
+        flex-grow: 1;
+    }
+
+    .friend-name {
+        font-weight: bold;
+        color: #eee;
+    }
+    
+    .friend-status {
+        font-size: 0.8em;
+        color: #888;
+    }
+    
+    .status-online { color: #00ff00; }
+</style>
+
+<div class="cso-container">
+    <div class="cso-header">
+        <span>[ 戰友系統 ] 添加 / 管理</span>
+        <span>
+            <a href="{% url 'user_profile' user.pk %}">
+                X
+            </a>
+        </span>
+    </div>
+
+    <div class="cso-body">
+        
+        <!-- 顯示系統訊息 (例如: 成功加入好友) -->
+        {% if messages %}
+            {% for message in messages %}
+            <div class="cso-message">
+                SYSTEM: {{ message }}
+            </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- 輸入 ID 的表單 -->
+        <div class="cso-form-box">
+            <form method="post">
+                {% csrf_token %}
+                <label class="cso-label">輸入目標 ID 指令:</label>
+                {{ form.target_id }}
+                <button type="submit" class="cso-btn">確認執行</button>
+            </form>
+            <div style="margin-top:5px; font-size:0.8em; color:#666;">
+                * 請輸入特工的數字編號以建立連結
+            </div>
+        </div>
+
+        <!-- 好友列表 -->
+        <div class="friend-list-header">
+            已建立連線的戰友 ({{ friend_list|length }})
+        </div>
+
+        <div class="friend-list-container">
+            {% for friend in friend_list %}
+            <div class="friend-item">
+                <div class="friend-avatar">
+                    <!-- 這裡顯示頭像，如果沒有就顯示文字 -->
+                    {% if friend.avatar %}
+                        <img src="{{ friend.avatar.url }}" style="width:100%; height:100%;">
+                    {% else %}
+                        IMG
+                    {% endif %}
+                </div>
+                <div class="friend-info">
+                    <div class="friend-name">
+                        {{ friend.codename|default:friend.user.username }} 
+                        <span style="color:#f3c500; font-size:0.8em;">[ID: {{ friend.user.id }}]</span>
+                    </div>
+                    <div class="friend-status">
+                        狀態: <span class="status-online">{{ friend.status|default:"Online" }}</span>
+                    </div>
+                </div>
+                <div style="font-size:0.8em; color:#555;">
+                    [ 已連線 ]
+                </div>
+            </div>
+            {% empty %}
+            <div style="padding: 20px; text-align: center; color: #666;">
+                目前沒有戰友連線。請在上輸入 ID 進行添加。
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

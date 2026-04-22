@@ -1,0 +1,100 @@
+<!-- templates/navbar.html -->
+<style>
+    /* CIA 頂部導航欄樣式 */
+    .cia-navbar {
+        background-color: #000;
+        color: #ddd;
+        padding: 0 20px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-family: var(--font-sans);
+        border-bottom: 2px solid var(--cia-red);
+        box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+        position: sticky; /* 固定在頂部 */
+        top: 0;
+        z-index: 1000;
+    }
+
+    .nav-brand {
+        font-weight: 900;
+        letter-spacing: 2px;
+        color: #fff;
+        text-decoration: none;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+    }
+    
+    .nav-brand span {
+        color: var(--cia-red);
+        margin-right: 5px;
+    }
+
+    .nav-menu {
+        display: flex;
+        gap: 20px;
+    }
+
+    .nav-link {
+        color: #888;
+        text-decoration: none;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 5px 10px;
+        transition: all 0.3s;
+        border: 1px solid transparent;
+    }
+
+    .nav-link:hover {
+        color: #fff;
+        border: 1px dashed #555;
+        background-color: rgba(255,255,255,0.1);
+    }
+
+    .nav-user-info {
+        font-size: 0.75rem;
+        color: var(--cia-blue);
+        margin-right: 15px;
+    }
+</style>
+
+<nav class="cia-navbar">
+    <!-- 左側 Logo -->
+    <a href="/" class="nav-brand">
+        <span>★</span> CIA /// ARCHIVES
+    </a>
+
+    <!-- 右側選單 -->
+    <div class="nav-menu">
+        <!-- 
+           假設你的文章列表 URL name 是 'post_list' 
+           假設你的新建文章 URL name 是 'post_new'
+        -->
+        <a href="{% url 'post_list' %}" class="nav-link">Intel Index / 檔案庫</a>
+        <a href="{% url 'realtime_chat' %}" class="nav-link">即時匯報</a>
+        {% if user.is_authenticated %}
+            <!-- 登入後才看得到的按鈕 -->
+            <a href="{% url 'post_new' %}" class="nav-link">New Op / 新任務</a>
+            
+            <!-- 
+               假設你的個人檔案 App (Profile) 的 URL name 是 'profile_detail' 
+               這裡直接連結到個人檔案頁面
+            -->
+            <a href="{% url 'user_profile' user.pk %}" class="nav-link">Agent Profile / 特工檔案</a>
+            
+            <!-- 登出 (通常需要 form 或者直接連結，視你的 auth 設定而定) -->
+            <span class="nav-user-info">AGENT: {{ user.username|upper }}</span>
+            <form action="{% url 'logout' %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="nav-link" style="background:none; border:none; cursor:pointer; color: var(--cia-red);">LOGOUT</button>
+            </form>
+        {% else %}
+            <!-- 未登入 -->
+            <a href="{% url 'login' %}" class="nav-link">Login / 身份驗證</a>
+            <a href="{% url 'register' %}" class="nav-link">Recruitment / 註冊</a>
+        {% endif %}
+    </div>
+</nav>

@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* 局部樣式：只針對刪除頁面的特殊 CIA 風格 */
+    .destruction-notice {
+        border: 2px solid var(--cia-red);
+        background-color: rgba(185, 29, 71, 0.05); /* 淡紅背景 */
+        padding: 30px;
+        position: relative;
+        margin-top: 20px;
+        /* 增加一點 "紙張被標記" 的感覺 */
+        box-shadow: 0 0 10px rgba(185, 29, 71, 0.1); 
+    }
+
+    .destruction-notice::before {
+        content: "WARNING: IRREVERSIBLE ACTION";
+        position: absolute;
+        top: -12px;
+        left: 20px;
+        background-color: var(--cia-red);
+        color: white;
+        padding: 2px 10px;
+        font-size: 0.8rem;
+        font-family: var(--font-sans);
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+
+    .target-file {
+        font-family: var(--font-typewriter);
+        background-color: #000;
+        color: #0f0; /* 終端機綠，強調這是數據 */
+        padding: 10px;
+        margin: 20px 0;
+        border-left: 5px solid var(--cia-red);
+        font-size: 1.1rem;
+    }
+
+    /* 按鈕區域 */
+    .action-panel {
+        margin-top: 30px;
+        border-top: 1px dashed #999;
+        padding-top: 20px;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+    }
+
+    /* 確認刪除按鈕：像是一個紅色的大按鈕 */
+    .btn-danger {
+        background-color: var(--cia-red);
+        border: 2px solid var(--cia-red);
+        color: white;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        padding: 10px 25px;
+        box-shadow: 3px 3px 0px rgba(0,0,0,0.2); /* 硬陰影，像實體按鈕 */
+    }
+
+    .btn-danger:hover {
+        background-color: #8b0000;
+        border-color: #8b0000;
+        transform: translate(1px, 1px);
+        box-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+    }
+
+    /* 取消按鈕：像是普通的檔案歸檔操作 */
+    .btn-secondary {
+        background-color: #ccc;
+        border: 2px solid #999;
+        color: #333;
+        font-family: var(--font-sans);
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .btn-secondary:hover {
+        background-color: #bbb;
+        color: #000;
+    }
+
+    /* 印章效果 */
+    .stamp-container {
+        position: absolute;
+        right: 20px;
+        top: 20px;
+        opacity: 0.2;
+        transform: rotate(-15deg);
+        pointer-events: none;
+    }
+    
+    .stamp-text {
+        color: var(--cia-red);
+        border: 5px solid var(--cia-red);
+        padding: 10px;
+        font-size: 2rem;
+        font-weight: 900;
+        font-family: var(--font-sans);
+        text-transform: uppercase;
+    }
+</style>
+
+<div class="destruction-notice">
+    <!-- 背景裝飾印章 -->
+    <div class="stamp-container">
+        <div class="stamp-text">DESTRUCTION<br>PENDING</div>
+    </div>
+
+    <h2 style="color: var(--cia-red); border-bottom: none; margin-top: 0;">
+        CONFIRM DELETION PROTOCOL
+    </h2>
+    
+    <p style="font-family: var(--font-sans); font-size: 0.9rem; color: #555;">
+        You are about to permanently remove the following classified record from the database. 
+        <br>This action cannot be undone by field agents.
+    </p>
+
+    <!-- 顯示要刪除的標題，做成像是終端機代碼的樣子 -->
+    <div class="target-file">
+        >> TARGET: "{{ object.title }}"
+    </div>
+
+    <form method="post" class="action-panel">
+        {% csrf_token %}
+        
+        <button type="submit" class="btn btn-danger">
+            ⚠️ EXECUTE DESTRUCTION / 確認銷毀
+        </button>
+        
+        <a href="{% url 'post_detail' object.pk %}" class="btn btn-secondary">
+            ABORT / 取消操作
+        </a>
+    </form>
+</div>
+{% endblock %}

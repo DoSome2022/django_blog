@@ -1,0 +1,437 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- 雖然 VT323 不支援中文，但留著可以讓數字和英文保持像素風格 -->
+<link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+
+<div class="cs-wrapper">
+    <div class="cs-window">
+        <!-- 頂部標題列 -->
+        <div class="cs-title-bar">
+            <!-- 顯示代號，如果沒代號就顯示用戶名 -->
+            <span class="cs-title-text">特工檔案: {{ user.profile.codename|default:user.username|upper }}</span>
+            <span >
+            <a href="{% url 'user_list'%}" class="cs-close" title="關閉檔案">
+             X   
+            </a>
+            
+            </span>
+        </div>
+
+        <div class="cs-content">
+            <!-- 左側：頭像與狀態 -->
+            <div class="cs-sidebar">
+                <div class="cs-avatar-frame">
+                    <!-- 頭像判斷邏輯 -->
+                    {% if user.profile.avatar %}
+                        <img src="{{ user.profile.avatar.url }}" alt="Avatar" class="cs-avatar">
+                    {% else %}
+                        <!-- 預設 CS 風格頭像 -->
+                        <img src="https://via.placeholder.com/150/2c3e50/5c946e?text=[+NO+IMG+]" alt="Avatar" class="cs-avatar">
+                    {% endif %}
+                    
+                    <!-- 狀態顯示 (使用 get_status_display 顯示中文選項) -->
+                    <div class="cs-status">
+                        狀態: <!-- 邏輯：如果是 KIA 就加上 status-kia 樣式，否則加上 status-ok 樣式 -->
+                        <span class="blink {% if user.profile.status == 'KIA' %}status-kia{% else %}status-ok{% endif %}">
+                            {{ user.profile.get_status_display|default:"UNKNOWN" }}
+                        </span>
+
+                    </div>
+                </div>
+                
+                <div class="cs-actions">
+                    <button class="cs-btn">
+                        <a href="{% url 'add_agents_fd' %}"  class="cs16-btn">
+                            加入好友 (Add Friend)
+                        </a>
+                    </button>
+                    <button class="cs-btn">
+                        <a href="{%  url 'friend_list' %}" class="cs-btn" >
+                            發送加密訊息 (Encrypt Msg)
+                        </a>
+                    </button>
+                    {% if user == request.user %}
+                        <!-- 這裡之後可以連結到編輯頁面 -->
+                        <a href="{% url 'user_profile_edit'%}" class="cs-btn btn-warning">修改設定 (Config / Edit)</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- 右側：詳細資料 -->
+            <div class="cs-main-info">
+                
+                <!-- 像 Console 一樣的資訊顯示 -->
+                <div class="cs-console">
+                    <p>> 正在載入特工資料...</p>
+                    <p>> 正在從伺服器解密數據...</p>
+                    <p>> --------------------------------</p>
+                    
+                    <!-- 代號 -->
+                    <p>> <span class="cs-var">代號 Codename:</span> {{ user.profile.codename|default:"UNASSIGNED" }}</p>
+                    
+                    <!-- 專長 -->
+                    <p>> <span class="cs-var">專長 Spec:</span> {{ user.profile.specialization }}</p>
+                    
+                    <!-- 權限等級 -->
+                    <p>> <span class="cs-var">權限 Clearance:</span> LEVEL {{ user.profile.clearance_level }}</p>
+                    
+                    <p>> <span class="cs-var">入隊時間 Joined:</span> {{ user.date_joined|date:"Y-m-d" }}</p>
+                    
+                    <!-- 根據權限等級顯示不同顏色 -->
+                    <p>> <span class="cs-var">系統識別:</span> 
+                        {% if user.is_staff %} 
+                            <span class="text-admin">管理員 (ADMIN)</span> 
+                        {% else %} 
+                            <span style="color: #0f0;">外勤特工 (AGENT)</span> 
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Bio 區域 -->
+                <div class="cs-bio-box">
+                    <h3 class="cs-section-title">任務簡報 / 個人經歷 (MISSION LOG)</h3>
+                    <div class="cs-bio-text">
+                        {% if user.profile.bio %}
+                            {{ user.profile.bio|linebreaks }}
+                        {% else %}
+                            > 系統提示：目前沒有可用的任務數據。<br>
+                            > 該特工行蹤成謎，暫無詳細紀錄 (No Data Available)。
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- 統計數據表格風格 -->
+                <table class="cs-stats-table">
+                    <thead>
+                        <tr>
+                            <th colspan="2" style="text-align: center; background: rgba(255,204,0,0.1);">戰鬥數據 (COMBAT STATS)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>完成任務 (Missions)</td>
+                            <td style="color: #0f0;">{{ user.profile.missions_completed }}</td>
+                        </tr>
+                        <tr>
+                            <td>確認擊殺 (Confirmed Kills)</td>
+                            <td style="color: #ff3333;">{{ user.profile.confirmed_kills }}</td>
+                        </tr>
+                        <tr>
+                            <td>命中率 (Accuracy)</td>
+                            <td>{{ user.profile.accuracy }}%</td>
+                        </tr>
+                        <tr>
+                            <td>發布情報 (Posts)</td>
+                            <td>{{ user.post_set.count }}</td> <!-- 假設你有 Post 模型 -->
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
+        
+        <!-- 底部狀態列 -->
+        <div class="cs-footer">
+            <span>FPS: 99</span>
+            <span>PING: 5 ms</span>
+            <span>ID: {{ user.id }}</span>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* CSS 樣式完全保留原本的 */
+
+    .cs-wrapper {
+        font-family: 'VT323', 'Courier New', 'PMingLiU', monospace; 
+        background-color: #1b1b1b; 
+        padding: 40px 20px;
+        min-height: 80vh;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        color: #ddd;
+    }
+
+    .cs-window {
+        width: 100%;
+        max-width: 900px;
+        background-color: #262626;
+        border: 2px solid #5e6d5e;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
+    }
+
+    .cs-title-bar {
+        background: linear-gradient(90deg, #004400, #002200);
+        padding: 8px 15px;
+        border-bottom: 2px solid #00FF00;
+        display: flex;
+        justify-content: space-between; /* 關鍵：讓標題靠左，X 靠右 */
+        align-items: center;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+    /* 新增 X 按鈕的樣式 */
+    .cs-close {
+        text-decoration: none;      /* 去除底線 */
+        font-family: Arial, sans-serif; /* 用無襯線字體，X 比較好看 */
+        font-weight: bold;
+        font-size: 1.2em;           /* 稍微大一點 */
+        transition: color 0.1s;     /* 顏色變化過渡效果 */
+        padding: 0 5px;             /* 增加一點點點擊範圍 */
+        
+        /* 狀態 1: 預設顏色 (黃色) */
+        color: #FFEE00; 
+    }
+
+    /* 狀態 2: 滑鼠指向時 (白色) */
+    .cs-close:hover {
+        color: #FFFFFF;
+        text-shadow: 0 0 5px #FFFFFF; /* 加一點發光效果更有質感 */
+        cursor: pointer;
+    }
+
+    /* 狀態 3: 按下時 (變回黃色) */
+    .cs-close:active {
+        color: #FFEE00;
+        text-shadow: none;
+        transform: translateY(1px); /* 按下時稍微往下沉一點點，增加按鈕感 */
+    }
+
+    .cs-content {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 20px;
+        gap: 20px;
+        background-image: repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 2px,
+            rgba(0, 255, 0, 0.03) 2px,
+            rgba(0, 255, 0, 0.03) 4px
+        ); 
+    }
+
+    .cs-sidebar {
+        flex: 1;
+        min-width: 200px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .cs-avatar-frame {
+        border: 1px solid #5e6d5e;
+        padding: 3px;
+        background: #000;
+        text-align: center;
+        min-height: 200px; /* 確保沒圖時也有高度 */
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .cs-avatar {
+        width: 100%;
+        height: auto;
+        max-height: 250px;
+        object-fit: cover;
+        display: block;
+        filter: contrast(1.2) sepia(0.2); 
+    }
+
+    .cs-status {
+        background: #111;
+        color: #0f0;
+        font-size: 1.1rem;
+        padding: 5px;
+        border-top: 1px solid #5e6d5e;
+    }
+
+    .blink {
+        animation: blinker 1.5s linear infinite;
+    }
+    @keyframes blinker { 50% { opacity: 0; } }
+    /* --- 新增這兩段 --- */
+    .status-kia {
+        color: red;
+    }
+    .status-ok {
+        color: #0f0; /* 螢光綠 */
+    }
+.cs-btn {
+    /* 讓 a 標籤表現得像方塊按鈕 */
+    display: inline-block;
+    box-sizing: border-box;
+    
+    /* 經典字體與大小 */
+    font-family: "Tahoma", "Verdana", sans-serif;
+    font-size: 11px;
+    font-weight: bold;
+    color: #c5c5c5 !important; /* 經典灰白色文字 */
+    text-decoration: none; /* 去掉底線 */
+    
+    /* 尺寸與間距 */
+    padding: 6px 16px;
+    margin-top: 10px;
+    
+    /* CS 1.6 經典深綠色背景漸層 */
+    background-color: #4b5b4b;
+    background: linear-gradient(to bottom, #5d6d5d 0%, #3b4b3b 100%);
+    
+    /* 邊框效果 (做出立體感) */
+    border: 1px solid #000000;
+    border-top: 1px solid #758575; /* 上緣亮光 */
+    border-left: 1px solid #758575; /* 左緣亮光 */
+    border-right: 1px solid #2b3b2b; /* 右緣陰影 */
+    border-bottom: 1px solid #2b3b2b; /* 下緣陰影 */
+    
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+}
+
+/* 滑鼠移過去的效果 (變亮) */
+.cs-btn:hover {
+    color: #ffffff !important; /* 文字變全白 */
+    background: linear-gradient(to bottom, #6d7d6d 0%, #4b5b4b 100%);
+    border-top: 1px solid #859585;
+    border-left: 1px solid #859585;
+    text-decoration: none;
+}
+
+/* 按下去的效果 (凹陷感) */
+.cs-btn:active {
+    position: relative;
+    top: 1px; /* 往下沉 1px */
+    background: #2b3b2b;
+    border: 1px solid #4b5b4b;
+    box-shadow: inset 1px 1px 4px #000000; /* 內部陰影 */
+    color: #aaaaaa !important;
+}
+
+    .btn-warning {
+        border-color: #d32f2f;
+        color: #ff8a80;
+    }
+    .btn-warning:hover {
+        background: #d32f2f;
+        color: white;
+    }
+
+    .cs-main-info {
+        flex: 3;
+        min-width: 300px;
+    }
+
+    .cs-console {
+        background-color: #000;
+        border: 1px inset #5e6d5e;
+        padding: 15px;
+        font-size: 1.1rem;
+        color: #ccc;
+        margin-bottom: 20px;
+        box-shadow: inset 0 0 10px #000;
+        line-height: 1.4;
+    }
+
+    .cs-console p {
+        margin: 2px 0;
+    }
+
+    .cs-var {
+        color: #ffcc00;
+    }
+
+    .text-admin {
+        color: #d32f2f;
+        font-weight: bold;
+    }
+
+    .cs-bio-box {
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid #444;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+
+    .cs-section-title {
+        color: #92a392;
+        border-bottom: 1px solid #444;
+        margin-top: 0;
+        font-size: 1.3rem;
+        padding-bottom: 5px;
+    }
+
+    .cs-bio-text {
+        color: #a0b69e;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    .cs-stats-table {
+        width: 100%;
+        border-collapse: collapse;
+        color: #ddd;
+        font-size: 1.1rem;
+    }
+
+    .cs-stats-table th {
+        text-align: left;
+        border-bottom: 1px solid #ffcc00;
+        color: #ffcc00;
+        padding: 8px 5px;
+    }
+
+    .cs-stats-table td {
+        border-bottom: 1px solid #333;
+        padding: 8px 5px;
+    }
+
+    .cs-footer {
+        background: #111;
+        border-top: 1px solid #5e6d5e;
+        padding: 5px 15px;
+        display: flex;
+        gap: 20px;
+        color: #555;
+        font-size: 0.9rem;
+    }
+
+    /* CS 1.6 Menu Button Style */
+.cs16-btn {
+    background: transparent;      /* 背景透明 */
+    border: none;                 /* 無邊框 */
+    color: #5e6855;              /* 預設顏色：暗淡的軍綠色/灰色 */
+    font-family: "Verdana", sans-serif; /* CS1.6 常用字體 */
+    font-weight: bold;
+    font-size: 14px;
+    text-align: left;
+    padding: 5px 10px;
+    cursor: pointer;
+    text-decoration: none;        /* 去除超連結底線 */
+    display: block;               /* 讓它佔滿一行，像選單一樣 */
+    width: 100%;
+    transition: all 0.1s;
+}
+
+/* 滑鼠移上去時的效果 */
+.cs16-btn:hover {
+    color: #9eb584;              /* 變亮綠色/米色 */
+    text-shadow: 0 0 5px rgba(158, 181, 132, 0.5); /* 微微發光 */
+    background: rgba(0, 0, 0, 0.2); /* 微微的黑色背景 */
+    border-left: 3px solid #9eb584; /* 左邊出現亮條，像選單選中 */
+}
+
+/* 確保裡面的連結樣式也被覆蓋 */
+.cs16-btn a {
+    color: inherit;              /* 跟隨父層顏色 */
+    text-decoration: none;       /* 去除底線 */
+    display: block;              /* 讓連結填滿按鈕 */
+    width: 100%;
+    height: 100%;
+}
+
+</style>
+{% endblock %}

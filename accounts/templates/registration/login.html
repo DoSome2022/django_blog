@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIS // 授權登入</title>
+    <style>
+        :root {
+            --mi6-bg: #0b0f19;       /*極深藍黑*/
+            --mi6-panel: #111827;    /*面板背景*/
+            --mi6-border: #1f2937;   /*邊框色*/
+            --mi6-accent: #1e3a8a;   /*皇家藍*/
+            --mi6-gold: #c29f6d;     /*皇家金 (低調奢華)*/
+            --mi6-text: #e5e7eb;     /*銀灰白*/
+            --mi6-alert: #991b1b;    /*暗紅 (警告)*/
+            
+            --font-serif: 'Times New Roman', serif; /* 英國政府公文感 */
+            --font-sans: 'Arial', sans-serif;       /* 現代俐落感 */
+        }
+
+        body {
+            background-color: var(--mi6-bg);
+            color: var(--mi6-text);
+            font-family: var(--font-sans);
+            margin: 0;
+            height: 100vh;
+            width: 100vw;
+            
+            /* 1. 絕對置中 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            /* 背景：世界地圖般的深色紋理 */
+            background-image: radial-gradient(circle at center, #1a2236 0%, #0b0f19 70%);
+        }
+
+        .mi6-dossier {
+            /* 2. 容器加寬，字體變大 */
+            width: 450px;
+            background-color: var(--mi6-panel);
+            border: 1px solid var(--mi6-border);
+            border-top: 4px solid var(--mi6-gold); /* 頂部金色線條代表皇室/權威 */
+            padding: 3.5rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+            position: relative;
+        }
+
+        /* 浮水印 LOGO */
+        .mi6-dossier::before {
+            content: "SIS";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: var(--font-serif);
+            font-size: 12rem;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.03);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* 機密印章 */
+        .stamp {
+            text-align: center;
+            color: var(--mi6-alert);
+            border: 1px solid var(--mi6-alert);
+            font-size: 0.9rem;
+            font-weight: bold;
+            padding: 5px 15px;
+            display: inline-block;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            width: 100%;
+            box-sizing: border-box;
+            background: rgba(153, 27, 27, 0.1);
+        }
+
+        h2 {
+            font-family: var(--font-serif);
+            text-align: center;
+            font-size: 2.2rem;
+            color: white;
+            margin: 0 0 5px 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--mi6-gold);
+            margin-bottom: 40px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--mi6-border);
+            padding-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Method C: 手動欄位樣式 */
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 1;
+        }
+
+        label {
+            display: block;
+            font-family: var(--font-serif);
+            color: #9ca3af;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        /* 針對 Django input 的樣式覆蓋 */
+        input {
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid #374151;
+            color: white;
+            padding: 15px; /* 加大內距 */
+            font-size: 1.1rem; /* 加大字體 */
+            font-family: var(--font-sans);
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+            border-radius: 0; /* MI6 風格：方正銳利 */
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--mi6-gold); /* 聚焦時變金色 */
+            background-color: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 10px rgba(194, 159, 109, 0.2);
+        }
+
+        /* 錯誤訊息 */
+        .errorlist {
+            color: var(--mi6-alert);
+            font-size: 0.9rem;
+            list-style: none;
+            padding: 0;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        /* 按鈕樣式 */
+        button {
+            width: 100%;
+            background-color: var(--mi6-accent);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-size: 1.2rem;
+            font-family: var(--font-serif);
+            letter-spacing: 2px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s;
+            position: relative;
+            z-index: 1;
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            background-color: #1e40af; /* 亮一點的藍 */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 底部連結 */
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #6b7280;
+            position: relative;
+            z-index: 1;
+        }
+
+        .footer a {
+            color: var(--mi6-gold);
+            text-decoration: none;
+            border-bottom: 1px dotted var(--mi6-gold);
+            margin-left: 5px;
+            transition: color 0.3s;
+        }
+
+        .footer a:hover {
+            color: white;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="mi6-dossier">
+    <div class="stamp">OFFICIAL SENSITIVE // 機密文件</div>
+    
+    <h2>安全認證</h2>
+    <div class="subtitle">Her Majesty's Secret Service</div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- 全局錯誤 (例如帳號密碼不符) -->
+        {% if form.non_field_errors %}
+            <div style="border: 1px solid var(--mi6-alert); background: rgba(153,27,27,0.1); padding: 10px; margin-bottom: 20px; color: #ffcccc; text-align: center;">
+                {% for error in form.non_field_errors %}
+                    ⚠ {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- Method C: 迴圈渲染欄位 -->
+        {% for field in form %}
+            <div class="input-group">
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+                
+                {{ field }}
+                
+                {% if field.errors %}
+                    <ul class="errorlist">
+                    {% for error in field.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <button type="submit">確認身份 // AUTHENTICATE</button>
+    </form>
+
+    <div class="footer">
+        尚未取得權限？ 
+        <a href="{% url 'register' %}">申請特工代號</a>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<style>
+    .chat-box {
+        height: 300px;
+        overflow-y: auto;
+        border: 1px solid #444;
+        background: rgba(0,0,0,0.5);
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .msg-row {
+        margin-bottom: 8px;
+        font-size: 0.9em;
+    }
+
+    /* 對方的訊息 (橘色/白色) */
+    .msg-friend {
+        text-align: left;
+        color: #ddd;
+    }
+    .msg-friend .name {
+        color: #d47800; /* CSO 橘 */
+        font-weight: bold;
+    }
+
+    /* 我的訊息 (綠色) */
+    .msg-me {
+        text-align: right;
+        color: #00ff00; /* 終端機綠 */
+    }
+    .msg-me .name {
+        color: #00aa00;
+        font-weight: bold;
+    }
+
+    .time {
+        font-size: 0.7em;
+        color: #666;
+    }
+</style>
+
+<div class="cso-container">
+    <div class="cso-header">
+        <span>[ 密語頻道 ] 與 {{ friend_user.username }} 通訊中...</span>
+        <span><a href="{% url 'user_profile' friend_user.id %}" class="cso-close-btn">X</a></span>
+    </div>
+
+    <div class="cso-body">
+        
+        <!-- 對話紀錄區 -->
+        <div class="chat-box" id="chatContainer">
+            {% for chat in chats %}
+                {% if chat.sender == request.user %}
+                    <!-- 我發的 -->
+                    <div class="msg-row msg-me">
+                        <span class="time">[{{ chat.timestamp|date:"H:i" }}]</span>
+                        {{ chat.content }} : <span class="name">Me</span>
+                    </div>
+                {% else %}
+                    <!-- 對方發的 -->
+                    <div class="msg-row msg-friend">
+                        <span class="name">{{ chat.sender.username }}</span> : 
+                        {{ chat.content }}
+                        <span class="time">[{{ chat.timestamp|date:"H:i" }}]</span>
+                    </div>
+                {% endif %}
+            {% empty %}
+                <div style="text-align: center; color: #555; margin-top: 50px;">
+                    -- 無線電靜默 (No Messages) --
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- 輸入區 -->
+        <div class="cso-form-box">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.content }}
+                <div style="text-align: right; margin-top: 5px;">
+                    <button type="submit" class="cso-btn">發送 (SEND)</button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // 自動捲動到底部
+    var chatBox = document.getElementById("chatContainer");
+    chatBox.scrollTop = chatBox.scrollHeight;
+</script>
+
+{% endblock %}

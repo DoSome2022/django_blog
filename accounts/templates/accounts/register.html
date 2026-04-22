@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECURE ACCESS // REGISTER</title>
+    <style>
+        :root {
+            --pentagon-bg: #000000;
+            --pentagon-green: #00ff00; /* 更亮的螢光綠 */
+            --pentagon-dim-green: #003300;
+            --pentagon-alert: #ff3333;
+            --font-stack: 'Courier New', Courier, monospace; 
+        }
+
+        body {
+            background-color: var(--pentagon-bg);
+            color: var(--pentagon-green);
+            font-family: var(--font-stack);
+            margin: 0;
+            height: 100vh;
+            width: 100vw;
+            
+            /* 1. 絕對置中設定 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            
+            /* 背景網格特效 */
+            background-image: 
+                linear-gradient(rgba(0, 255, 0, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 0, 0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        .container {
+            /* 2. 容器加寬，字體變大 */
+            width: 480px; /* 從 400 加寬到 480 */
+            max-width: 90%;
+            border: 4px solid var(--pentagon-green); /* 邊框加粗 */
+            padding: 3rem; /* 內距加大 */
+            background-color: rgba(0, 10, 0, 0.95);
+            box-shadow: 0 0 25px rgba(0, 255, 0, 0.2);
+            position: relative;
+        }
+
+        /* 頂部機密印章 */
+        .top-secret-stamp {
+            position: absolute;
+            top: -22px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #000;
+            color: var(--pentagon-alert);
+            border: 2px solid var(--pentagon-alert);
+            padding: 5px 20px;
+            font-weight: bold;
+            font-size: 1.2rem; /* 字體加大 */
+            letter-spacing: 3px;
+            white-space: nowrap;
+        }
+
+        h2 {
+            text-align: center;
+            border-bottom: 2px dashed var(--pentagon-green);
+            padding-bottom: 15px;
+            margin-top: 10px;
+            margin-bottom: 25px;
+            font-size: 2rem; /* 標題超大 */
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px var(--pentagon-green);
+        }
+
+        .terminal-text {
+            font-size: 1.1rem; /* 說明文字加大 */
+            margin-bottom: 30px;
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        /* 表單區域 */
+        .field-wrapper {
+            margin-bottom: 25px; /* 欄位間距加大 */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            font-size: 1.1rem; /* Label 字體加大 */
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        /* 針對 Django input 的樣式覆蓋 */
+        input {
+            width: 100%;
+            background-color: #000;
+            border: 2px solid var(--pentagon-dim-green); /* 邊框加粗 */
+            color: var(--pentagon-green);
+            padding: 15px; /* 輸入框內部空間加大 */
+            font-family: var(--font-stack);
+            font-size: 1.2rem; /* 輸入文字加大 */
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            border-color: var(--pentagon-green);
+            box-shadow: 0 0 15px var(--pentagon-green);
+            background-color: rgba(0, 50, 0, 0.3);
+        }
+
+        /* 幫助文字 (如密碼規則) */
+        .help-text {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.9rem; /* 幫助文字也稍微加大 */
+            color: #44aa44;
+            font-style: italic;
+        }
+
+        /* 錯誤列表 */
+        .errorlist {
+            list-style: none;
+            padding: 0;
+            margin: 5px 0 0 0;
+            color: var(--pentagon-alert);
+            font-weight: bold;
+        }
+
+        /* 按鈕樣式 */
+        button {
+            width: 100%;
+            background-color: var(--pentagon-dim-green);
+            color: var(--pentagon-green);
+            border: 2px solid var(--pentagon-green);
+            padding: 18px; /* 按鈕變大 */
+            font-family: var(--font-stack);
+            font-size: 1.5rem; /* 按鈕文字加大 */
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 20px;
+            letter-spacing: 2px;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--pentagon-green);
+            color: #000;
+            box-shadow: 0 0 20px var(--pentagon-green);
+        }
+
+        /* 讓 footer 連結也是綠色 */
+        a {
+            color: var(--pentagon-green);
+            text-decoration: none;
+            border-bottom: 1px dashed var(--pentagon-green);
+        }
+        a:hover {
+            background-color: var(--pentagon-green);
+            color: black;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-secret-stamp">TOP SECRET // CLASSIFIED</div>
+    
+    <h2>IDENTITY CREATION</h2>
+    
+    <div class="terminal-text">
+        > SYSTEM: INITIATING NEW USER PROTOCOL...<br>
+        > SECURITY LEVEL: <span style="color:red">MAXIMUM</span>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        <!-- 全局錯誤 -->
+        {% if form.non_field_errors %}
+            <div style="border: 2px solid red; padding: 10px; margin-bottom: 20px; color: red;">
+                {% for error in form.non_field_errors %}
+                    > ERROR: {{ error }}<br>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- 欄位迴圈 -->
+        {% for field in form %}
+            <div class="field-wrapper">
+                <label for="{{ field.id_for_label }}">
+                    > {{ field.label }}
+                </label>
+                
+                {{ field }}
+                
+                {% if field.errors %}
+                    <ul class="errorlist">
+                    {% for error in field.errors %}
+                        <li>[!] {{ error }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+                
+                {% if field.help_text %}
+                    <span class="help-text">{{ field.help_text }}</span>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        <button type="submit">>> GRANT ACCESS <<</button>
+        
+        <div style="text-align: center; margin-top: 20px; font-size: 1rem;">
+            ALREADY HAVE CLEARANCE? <a href="{% url 'login' %}">LOGIN</a>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

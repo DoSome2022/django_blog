@@ -1,0 +1,204 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<!-- 引入 BF2042 風格字體 -->
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+
+<style>
+    /* === BF2042 全局容器 === */
+    .bf-roster-container {
+        max-width: 900px;
+        margin: 40px auto;
+        color: #fff;
+        font-family: 'Rajdhani', sans-serif;
+    }
+
+    /* === 標題區塊 === */
+    .bf-header {
+        border-left: 5px solid #40E0D0; /* 青色 */
+        padding-left: 20px;
+        margin-bottom: 30px;
+        background: linear-gradient(90deg, rgba(64, 224, 208, 0.1), transparent);
+    }
+
+    .bf-header h1 {
+        font-size: 2.5rem;
+        text-transform: uppercase;
+        margin: 0;
+        letter-spacing: 2px;
+        font-weight: 700;
+        text-shadow: 0 0 10px rgba(64, 224, 208, 0.5);
+    }
+
+    .bf-header span {
+        font-size: 1rem;
+        color: #40E0D0;
+        letter-spacing: 1px;
+    }
+
+    /* === 好友卡片列表 === */
+    .squad-list {
+        display: grid;
+        grid-template-columns: 1fr; /* 手機版一欄 */
+        gap: 15px;
+    }
+    
+    /* 平板以上改兩欄 */
+    @media (min-width: 768px) {
+        .squad-list {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    /* === 單張戰友卡片 === */
+    .squad-card {
+        background: rgba(15, 20, 25, 0.9);
+        border: 1px solid #333;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        position: relative;
+        transition: 0.2s;
+        /* 切角造型 */
+        clip-path: polygon(0 0, 100% 0, 100% 85%, 95% 100%, 0 100%);
+    }
+
+    .squad-card:hover {
+        background: rgba(30, 40, 50, 1);
+        border-color: #40E0D0;
+        transform: translateX(5px); /* 滑鼠移上去向右滑動 */
+    }
+
+    /* 左側資訊 */
+    .card-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .avatar-box {
+        width: 50px;
+        height: 50px;
+        background: #000;
+        border: 1px solid #555;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #555;
+        font-size: 0.8rem;
+    }
+
+    .user-details h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: #eee;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .status-indicator {
+        font-size: 0.8rem;
+        color: #888;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .dot {
+        width: 8px;
+        height: 8px;
+        background-color: #40E0D0; /* 在線綠/青 */
+        border-radius: 50%;
+        box-shadow: 0 0 5px #40E0D0;
+    }
+
+    /* 右側按鈕區 */
+    .card-action {
+        text-align: right;
+    }
+
+    /* === 關鍵按鈕：進入對話 === */
+    .btn-comms {
+        display: inline-block;
+        background: transparent;
+        border: 1px solid #40E0D0;
+        color: #40E0D0;
+        padding: 8px 15px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        transition: 0.2s;
+        text-transform: uppercase;
+    }
+
+    .btn-comms:hover {
+        background: #40E0D0;
+        color: #000;
+        box-shadow: 0 0 15px rgba(64, 224, 208, 0.6);
+    }
+    
+    /* 裝飾線條 */
+    .deco-line {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        width: 30px;
+        background: #40E0D0;
+    }
+</style>
+
+<div class="bf-roster-container">
+    
+    <!-- 標題 -->
+    <div class="bf-header">
+        <h1>Active Squad Roster</h1>
+        <span>/// NO-PAT DATABASE :: CONNECTED ///</span>
+    </div>
+
+    <!-- 列表 -->
+    <div class="squad-list">
+        {% for friend in friends %}
+        <div class="squad-card">
+            
+            <div class="card-info">
+                <!-- 頭像框 (如果有頭像就顯示，沒有就顯示 No Img) -->
+                <div class="avatar-box">
+                    {% if friend.profile.avatar %}
+                        <img src="{{ friend.profile.avatar.url }}" style="width:100%; height:100%; object-fit: cover;">
+                    {% else %}
+                        IMG
+                    {% endif %}
+                </div>
+
+                <div class="user-details">
+                    <h3>{{ friend.username }}</h3>
+                    <div class="status-indicator">
+                        <div class="dot"></div> ONLINE
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-action">
+                <!-- 這裡就是你想要的那個「鍵」 -->
+                <!-- 點擊後跳轉到 chat_room 並帶入 friend.id -->
+                <a href="{% url 'chat_room' friend.id %}" class="btn-comms">
+                    CONNECT
+                </a>
+            </div>
+
+            <div class="deco-line"></div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; color: #666; padding: 50px;">
+            // NO SQUAD MEMBERS FOUND //
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+
+{% endblock %}

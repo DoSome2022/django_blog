@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Continental Armory{% endblock %} - 大陆酒店军火库</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'shop/css/style.css' %}">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Montserrat:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="ambient-overlay"></div>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">⚜️</span>
+                <span class="logo-text">CONTINENTAL<br><small>ARMORY & BOUTIQUE</small></span>
+            </div>
+            <div class="nav-links">
+                <a href="{% url 'shop:product_list' %}" class="nav-link">精品陈列</a>
+                <a href="{% url 'shop:cart_view' %}" class="nav-link cart-link">
+                    <span class="cart-icon">👜</span>
+                    <span class="cart-count" id="cartCount">0</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+    
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    
+    <footer class="footer">
+        <p>“做好准备，就是最大的尊重。” — 温斯顿</p>
+        <p class="footer-small">© 大陆酒店军火精品店 | 仅供专业人士鉴赏</p>
+    </footer>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'shop/js/cart.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

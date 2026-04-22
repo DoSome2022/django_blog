@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* 局部樣式：情報報告專用 */
+    .intelligence-report {
+        background-color: #fdfbf7; /* 紙張白 */
+        border: 1px solid #d1d5db;
+        padding: 50px;
+        position: relative;
+        box-shadow: 5px 5px 15px rgba(0,0,0,0.1);
+        font-family: var(--font-typewriter);
+    }
+
+    /* 頂部機密印章 */
+    .stamp-box {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        border: 3px solid var(--cia-red);
+        color: var(--cia-red);
+        padding: 5px 15px;
+        font-weight: 900;
+        font-size: 1.2rem;
+        transform: rotate(-5deg);
+        letter-spacing: 2px;
+        opacity: 0.8;
+        font-family: var(--font-sans);
+    }
+
+    /* 檔案元數據 (Metadata) */
+    .meta-data {
+        border-bottom: 2px solid #000;
+        margin-bottom: 30px;
+        padding-bottom: 10px;
+        font-size: 0.8rem;
+        display: flex;
+        justify-content: space-between;
+        color: #555;
+    }
+
+    .meta-item {
+        margin-right: 20px;
+    }
+
+    .meta-label {
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+
+    /* 標題樣式：SUBJECT */
+    .report-subject {
+        font-size: 2rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        margin-bottom: 40px;
+        color: #000;
+        letter-spacing: -1px;
+    }
+    
+    .report-subject::before {
+        content: "SUBJECT: ";
+        font-size: 1rem;
+        color: #666;
+        vertical-align: middle;
+        margin-right: 10px;
+    }
+
+    /* 正文內容 */
+    .report-body {
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #111;
+        white-space: pre-wrap; /* 保留換行 */
+        margin-bottom: 50px;
+        text-align: justify;
+    }
+
+    /* 底部操作區 */
+    .action-footer {
+        border-top: 1px dashed #999;
+        padding-top: 20px;
+        display: flex;
+        justify-content: flex-end; /* 按鈕靠右 */
+        gap: 15px;
+    }
+
+    /* 按鈕風格化 */
+    .btn-warning {
+        background-color: var(--cia-yellow);
+        border: 2px solid #000;
+        color: #000;
+        font-weight: bold;
+    }
+    .btn-warning:hover {
+        background-color: #f39c12;
+        box-shadow: 2px 2px 0 #000;
+    }
+
+    .btn-danger {
+        background-color: var(--cia-red);
+        border: 2px solid var(--cia-red);
+        color: #fff;
+    }
+    
+    /* 簽名欄位 (裝飾用) */
+    .signature-line {
+        margin-top: 50px;
+        width: 200px;
+        border-bottom: 1px solid #000;
+        position: absolute;
+        bottom: 100px;
+        left: 50px;
+    }
+    .signature-label {
+        font-size: 0.7rem;
+        position: absolute;
+        bottom: -20px;
+        left: 0;
+        color: #666;
+    }
+
+</style>
+
+<div class="intelligence-report">
+    <!-- 視覺裝飾 -->
+    <div class="stamp-box">TOP SECRET</div>
+    
+    <!-- 偽造的檔案資訊 -->
+    <div class="meta-data">
+        <span class="meta-item"><span class="meta-label">CASE ID:</span> #CIA-{{ object.pk|stringformat:"04d" }}</span>
+        <span class="meta-item"><span class="meta-label">DATE:</span> {% now "Y-m-d" %}</span> <!-- 顯示當前日期作為查看日期 -->
+        <span class="meta-item"><span class="meta-label">CLEARANCE:</span> LEVEL 5</span>
+    </div>
+
+    <!-- 標題 -->
+    <h2 class="report-subject">{{ object.title }}</h2>
+
+    <!-- 內文 -->
+    <div class="report-body">
+        {{ object.content|linebreaks }}
+    </div>
+
+    <!-- 裝飾簽名欄 -->
+    <div class="signature-line">
+        <span class="signature-label">AUTHORIZED OFFICER</span>
+    </div>
+
+    <!-- 按鈕區 -->
+    <div class="action-footer">
+        <div style="margin-right: auto; font-size: 0.8rem; color: #888; align-self: center;">
+            ACTIONS REQUIRED:
+        </div>
+        <a href="{% url 'post_edit' object.pk %}" class="btn btn-warning">
+            ✎ REVISE INTEL / 編輯
+        </a>
+        <a href="{% url 'post_delete' object.pk %}" class="btn btn-danger">
+            ✖ BURN NOTICE / 刪除
+        </a>
+    </div>
+</div>
+{% endblock %}

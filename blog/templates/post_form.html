@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* 局部樣式：情報輸入表單 */
+    .intel-entry-form {
+        background-color: #fdfbf7;
+        padding: 40px;
+        border: 1px solid #aaa;
+        position: relative;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    /* 表單頂部的 "機密" 條 */
+    .form-header-bar {
+        background-color: #000;
+        color: #fff;
+        padding: 5px 15px;
+        font-family: var(--font-sans);
+        font-size: 0.8rem;
+        letter-spacing: 2px;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    /* 標題樣式 */
+    h2 {
+        font-family: var(--font-sans);
+        text-transform: uppercase;
+        font-weight: 800;
+        border-bottom: 3px solid var(--cia-blue);
+        color: var(--cia-blue);
+        display: inline-block;
+        margin-bottom: 30px;
+    }
+
+    /* Django form.as_p 的樣式覆蓋 */
+    /* 我們利用 CSS 選擇器來強制修改 Django 預設輸出的樣式 */
+    
+    .intel-entry-form p {
+        margin-bottom: 25px;
+    }
+
+    /* 標籤 (Label) 變成小寫粗體指令 */
+    .intel-entry-form label {
+        display: block;
+        font-family: var(--font-sans);
+        font-size: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        color: #666;
+        margin-bottom: 5px;
+    }
+    
+    /* 輸入框 (Input/Textarea) 變成打字機填空風格 */
+    .intel-entry-form input[type="text"],
+    .intel-entry-form textarea {
+        width: 100%;
+        background-color: rgba(0, 0, 0, 0.02); /* 極淡的灰 */
+        border: none;
+        border-bottom: 2px solid #333; /* 只有底線 */
+        font-family: var(--font-typewriter);
+        font-size: 1.1rem;
+        padding: 10px;
+        color: #000;
+        transition: background-color 0.3s;
+    }
+
+    /* 輸入時高亮 */
+    .intel-entry-form input[type="text"]:focus,
+    .intel-entry-form textarea:focus {
+        outline: none;
+        background-color: rgba(241, 196, 15, 0.1); /* 淡黃色背景，像被選中 */
+        border-bottom-color: var(--cia-blue);
+    }
+
+    /* 按鈕容器 */
+    .form-actions {
+        margin-top: 40px;
+        border-top: 1px dashed #999;
+        padding-top: 20px;
+        text-align: right;
+    }
+
+    /* 保存按鈕：變成 "加密傳輸" 風格 */
+    .btn-success {
+        background-color: #27ae60;
+        border: 2px solid #27ae60;
+        color: white;
+        font-family: var(--font-sans);
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        padding: 10px 30px;
+        border-radius: 0;
+    }
+    
+    .btn-success:hover {
+        background-color: #219150;
+        box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    }
+    
+    /* 右上角的表單編號 */
+    .form-id {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 0.6rem;
+        color: #999;
+        font-family: var(--font-sans);
+    }
+
+</style>
+
+<div class="intel-entry-form">
+    <!-- 裝飾用的表單 ID -->
+    <div class="form-id">FORM 104-A // REV 2.0</div>
+
+    <!-- 頂部黑條 -->
+    <div class="form-header-bar">
+        <span>SENSITIVE COMPARTMENTED INFORMATION</span>
+        <span>EYES ONLY</span>
+    </div>
+
+    <!-- 標題：判斷是 "開始新行動" 還是 "修正情報" -->
+    <h2>
+        {% if object %}
+            >> MODIFY INTELLIGENCE / 編輯情報
+        {% else %}
+            >> INITIATE NEW OPERATION / 建立新案
+        {% endif %}
+    </h2>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- 這裡包裹了 form.as_p，利用 CSS 選擇器進行樣式大改 -->
+        <div class="mb-3">
+            {{ form.as_p }}
+        </div>
+
+        <div class="form-actions">
+            <span style="font-size: 0.8rem; color: #555; margin-right: 15px;">
+                VERIFY DATA INTEGRITY BEFORE TRANSMISSION
+            </span>
+            <button type="submit" class="btn btn-success">
+                ENCRYPT & SAVE / 加密存檔
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

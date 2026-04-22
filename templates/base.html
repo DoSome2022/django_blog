@@ -1,0 +1,43 @@
+<!-- templates/base.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CIA Intelligence Database</title>
+    <!-- 這裡放你的 CSS 變數定義 (root variables) -->
+    <style>
+        :root {
+            --cia-red: #c0392b;
+            --cia-blue: #2980b9;
+            --cia-yellow: #f1c40f;
+            --font-typewriter: 'Courier New', Courier, monospace;
+            --font-sans: 'Arial Black', sans-serif;
+        }
+        body {
+            background-color: #eee;
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif;
+        }
+        .main-content {
+            padding: 40px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- !!! 關鍵在這裡 !!! -->
+    <!-- 無論你是哪個 App 的 View，只要繼承 base.html，這個 Navbar 就會出現 -->
+    {% include 'navbar.html' %} 
+
+    <div class="main-content">
+        <!-- 這裡會被各個頁面的內容取代 -->
+        {% block content %}
+        {% endblock %}
+    </div>
+
+</body>
+</html>

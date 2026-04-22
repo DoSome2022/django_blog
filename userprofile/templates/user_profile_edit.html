@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+<div class="edit-card">
+    <div class="card-header">
+        <h2>System Configuration // 設定</h2>
+        <span style="font-size: 0.8rem; color: #666;">ID: {{ user.username }}</span>
+    </div>
+
+    <div class="card-body">
+        <!-- 注意：一定要加 enctype="multipart/form-data"，否則圖片無法上傳 -->
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- 1. 代號 (Codename) -->
+            <div class="form-group">
+                <label for="{{ form.codename.id_for_label }}">Code Name / 代號</label>
+                <!-- 手動渲染 input 並加上 class -->
+                <input type="text" 
+                       name="{{ form.codename.name }}" 
+                       id="{{ form.codename.id_for_label }}" 
+                       class="form-control"
+                       value="{{ form.codename.value|default:'' }}"
+                       placeholder="輸入特工代號...">
+                
+                {% if form.codename.errors %}
+                    <ul class="error-list">
+                        {% for error in form.codename.errors %}<li>⚠ {{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <!-- 2. 狀態 (Status) -->
+            <div class="form-group">
+                <label for="{{ form.status.id_for_label }}">Status / 當前狀態</label>
+                <!-- 使用 Django 預設渲染，但你可以用 widget_tweaks 套件優化，這裡用純 CSS 控制 -->
+                <select name="{{ form.status.name }}" id="{{ form.status.id_for_label }}" class="form-control">
+                    {% for value, label in form.fields.status.choices %}
+                        <option value="{{ value }}" {% if form.status.value == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- 3. 頭像 (Avatar) -->
+            <div class="form-group">
+                <label>Avatar / 識別頭像</label>
+                
+                <!-- 顯示目前頭像 (如果有) -->
+                {% if user.profile.avatar %}
+                    <div class="current-avatar">
+                        <img src="{{ user.profile.avatar.url }}" alt="Current Avatar" class="avatar-preview">
+                        <span style="color: #666; font-size: 0.8rem;">目前使用的識別證照片</span>
+                    </div>
+                {% endif %}
+
+                <!-- 上傳控制項 -->
+                <input type="file" 
+                       name="{{ form.avatar.name }}" 
+                       id="{{ form.avatar.id_for_label }}" 
+                       class="form-control" 
+                       style="padding: 5px; font-size: 0.9rem;">
+                
+                {% if form.avatar.errors %}
+                    <ul class="error-list">
+                        {% for error in form.avatar.errors %}<li>⚠ {{ error }}</li>{% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <!-- 按鈕區 -->
+            <div class="btn-group">
+                <button type="submit" class="btn btn-save">
+                    [ SAVE CHANGES / 儲存設定 ]
+                </button>
+                
+                <!-- 返回按鈕 (假設你的個人檔案頁面 url name 是 'user_profile') -->
+                <a href="{% url 'user_profile' user.pk%}" class="btn btn-cancel">
+                    CANCEL
+                </a>
+            </div>
+
+        </form>
+    </div>
+</div>
+<!-- 頁面專屬樣式 (Sci-Fi 風格) -->
+<style>
+    .edit-card {
+        max-width: 600px;
+        margin: 50px auto;
+        background-color: #0d0d0d; /*深黑背景*/
+        border: 1px solid #333;
+        box-shadow: 0 0 15px rgba(0, 255, 0, 0.1);
+        color: #e0e0e0;
+        font-family: 'Courier New', Courier, monospace;
+        padding: 0;
+    }
+
+    .card-header {
+        background-color: #1a1a1a;
+        padding: 15px 20px;
+        border-bottom: 2px solid #00ff00; /* 螢光綠底線 */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-header h2 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: #00ff00;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .card-body {
+        padding: 30px;
+    }
+
+    /* 表單欄位樣式 */
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #888;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+    }
+
+    /* 統一 input 和 select 的外觀 */
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        background-color: #050505;
+        border: 1px solid #444;
+        color: #fff;
+        font-family: inherit;
+        font-size: 1rem;
+        outline: none;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: #00ff00;
+        box-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
+    }
+
+    /* 圖片上傳區塊 */
+    .current-avatar {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 10px;
+        border: 1px dashed #444;
+        background: #111;
+    }
+    
+    .avatar-preview {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border: 1px solid #00ff00;
+    }
+
+    /* 按鈕樣式 */
+    .btn-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+    }
+
+    .btn {
+        padding: 10px 25px;
+        border: none;
+        cursor: pointer;
+        font-family: inherit;
+        font-weight: bold;
+        text-transform: uppercase;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-save {
+        background-color: #00ff00;
+        color: #000;
+        flex: 2;
+    }
+    .btn-save:hover {
+        background-color: #00cc00;
+        box-shadow: 0 0 10px #00ff00;
+    }
+
+    .btn-cancel {
+        background-color: #333;
+        color: #fff;
+        border: 1px solid #555;
+        flex: 1;
+    }
+    .btn-cancel:hover {
+        background-color: #444;
+        border-color: #fff;
+    }
+
+    /* 錯誤訊息 */
+    .error-list {
+        color: #ff3333;
+        list-style: none;
+        padding: 0;
+        margin-top: 5px;
+        font-size: 0.8rem;
+    }
+</style>
+{% endblock %}
+
+
+
+

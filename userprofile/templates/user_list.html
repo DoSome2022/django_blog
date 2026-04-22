@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* StarCraft 1 Terran Theme CSS */
+    .sc-container {
+        background-color: #000;
+        color: #00FF00; /* SC1 Terminal Green */
+        font-family: "Courier New", Courier, monospace;
+        border: 4px solid #444;
+        padding: 20px;
+        max-width: 800px;
+        margin: 20px auto;
+        box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+    }
+
+    .sc-header {
+        border-bottom: 2px dashed #00FF00;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        text-align: center;
+        text-shadow: 0 0 5px #00FF00;
+    }
+
+    .sc-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+    .sc-table th {
+        text-align: left;
+        border-bottom: 1px solid #008800;
+        padding: 10px;
+        color: #AAFFAA;
+    }
+
+    .sc-table td {
+        padding: 8px 10px;
+        border-bottom: 1px solid #222;
+    }
+
+    .sc-table tr:hover {
+        background-color: #001100;
+        cursor: crosshair; /* SC1 Cursor feel */
+    }
+
+    .status-badge {
+        border: 1px solid #00FF00;
+        padding: 2px 6px;
+        font-size: 0.8em;
+        background: rgba(0, 255, 0, 0.1);
+    }
+
+    /* Pagination Styling */
+    .sc-pagination {
+        text-align: center;
+        margin-top: 20px;
+        border-top: 1px dashed #444;
+        padding-top: 10px;
+    }
+
+    .sc-btn {
+        background-color: #000;
+        color: #00FF00;
+        border: 1px solid #00FF00;
+        padding: 5px 15px;
+        text-decoration: none;
+        margin: 0 5px;
+        transition: all 0.1s;
+    }
+
+    .sc-btn:hover {
+        background-color: #00FF00;
+        color: #000;
+        font-weight: bold;
+    }
+
+    .current-page {
+        color: #FFF;
+        font-weight: bold;
+    }
+</style>
+
+<div class="sc-container">
+    <h2 class="sc-header">/// BATTLE.NET AGENT DATABASE ///</h2>
+
+    <table class="sc-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>CODENAME</th>
+                <th>STATUS</th>
+                <th>ACTION</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for agent in agents %}
+            <tr>
+                <td>#{{ agent.user.id }}</td>
+                <td>
+                    {% if agent.codename %}
+                        {{ agent.codename }}
+                    {% else %}
+                        [UNKNOWN]
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="status-badge">{{ agent.status|default:"Offline" }}</span>
+                </td>
+                <td>
+                    <!-- 預留給加好友按鈕 -->
+                    <a href="#" class="sc-btn" style="font-size: 0.7em;">[ + ALLY ]</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 20px;">
+                    NO AGENTS FOUND IN SECTOR.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- 分頁導覽 -->
+    {% if is_paginated %}
+    <div class="sc-pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1" class="sc-btn">&lt;&lt; FIRST</a>
+            <a href="?page={{ page_obj.previous_page_number }}" class="sc-btn">&lt; PREV</a>
+        {% endif %}
+
+        <span class="current-page">
+            SECTOR {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="sc-btn">NEXT &gt;</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}" class="sc-btn">LAST &gt;&gt;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <div style="margin-top: 20px; text-align: right; font-size: 0.8em; color: #555;">
+        SYSTEM READY.
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,255 @@
+<!-- templates/chat/message_board.html -->
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECURE CHANNEL // FBI TERMINAL</title>
+    <style>
+        /* --- FBI / 機密檔案風格 CSS --- */
+        body {
+            background-color: #0d1117; /* 深色背景 */
+            color: #c9d1d9; /* 柔和白字 */
+            font-family: 'Courier New', Courier, monospace; /* 打字機字體 */
+            margin: 0;
+            padding: 20px;
+        }
+
+        /* 頂部標題 */
+        .fbi-header-line {
+            border-top: 3px solid #b71c1c; /* 紅色警戒線 */
+            border-bottom: 1px solid #30363d;
+            padding: 10px 0;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #b71c1c;
+            font-weight: bold;
+            letter-spacing: 2px;
+            font-size: 1.2em;
+        }
+
+        /* --- 輸入區域 (Input Area) --- */
+        .input-area {
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-top: 4px solid #fdd835; /* 頂部黃色警示條 */
+            padding: 25px;
+            max-width: 700px;
+            margin: 0 auto 40px auto; /* 置中並與下方留白 */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+            position: relative;
+        }
+
+        /* "CLASSIFIED" 浮水印 */
+        .input-area::before {
+            content: "TOP SECRET // CLASSIFIED";
+            position: absolute;
+            top: -12px;
+            right: 10px;
+            background-color: #0d1117;
+            font-size: 12px;
+            color: #fdd835;
+            border: 1px solid #fdd835;
+            padding: 2px 8px;
+        }
+
+        /* 輸入框樣式 */
+        .input-area input[type="text"],
+        .input-area textarea {
+            width: 100%;
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            color: #58a6ff; /* 科技藍文字 */
+            padding: 12px;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+            box-sizing: border-box; 
+        }
+
+        .input-area input[type="text"]:focus,
+        .input-area textarea:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 8px rgba(88, 166, 255, 0.2);
+        }
+
+        /* Label 樣式 */
+        .form-label {
+            display: block;
+            color: #8b949e; 
+            font-size: 12px;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        /* 檔案上傳按鈕 */
+        .input-area input[type="file"] {
+            color: #8b949e;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+        }
+
+        /* --- 提交按鈕 --- */
+        .cs-btn {
+            background-color: #1f6feb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 3px;
+            letter-spacing: 1px;
+            width: 100%;
+            transition: background 0.3s;
+        }
+        .cs-btn:hover {
+            background-color: #388bfd;
+        }
+
+        /* --- 留言列表區 --- */
+        .message-list {
+            max-width: 700px;
+            margin: 0 auto;
+            padding-bottom: 50px;
+        }
+
+        .list-header {
+            text-align: center;
+            color: #30363d;
+            margin: 20px 0;
+            font-size: 0.8em;
+        }
+
+        /* 單個留言框 (Case File) */
+        .cs-message-box {
+            background-color: #1c2128;
+            border-left: 4px solid #238636; /* 綠色表示已記錄 */
+            border-bottom: 1px solid #30363d;
+            padding: 15px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        /* 名字 (Agent Name) */
+        .cs-name {
+            color: #fdd835; 
+            font-weight: bold;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            margin-right: 10px;
+        }
+        .cs-name::before {
+            content: "AGENT ID: ";
+            color: #8b949e;
+            font-size: 0.7em;
+            font-weight: normal;
+        }
+
+        /* 時間 (Timestamp) */
+        .cs-time {
+            color: #8b949e;
+            font-size: 0.75em;
+            float: right;
+            border: 1px solid #30363d;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* 內容文字 */
+        .cs-message-box p {
+            margin-top: 15px;
+            line-height: 1.6;
+            color: #e6edf3;
+            border-top: 1px dashed #30363d;
+            padding-top: 10px;
+            white-space: pre-line; /* 保留換行 */
+        }
+
+        /* 圖片 (Evidence) */
+        .evidence-box {
+            margin-top: 15px;
+            background: #000;
+            padding: 10px;
+            display: inline-block;
+            border: 1px solid #30363d;
+        }
+        .evidence-label {
+            font-size: 10px; 
+            color: #8b949e; 
+            display: block; 
+            margin-bottom: 5px;
+        }
+        .cs-message-box img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #fff; 
+            opacity: 0.9;
+        }
+        .cs-message-box img:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 頁面標題 -->
+    <div class="fbi-header-line">
+        FEDERAL BUREAU OF INVESTIGATION // SECURE CHANNEL
+    </div>
+
+    <!-- 表單區 -->
+    <!-- 記得要加 enctype，否則圖片傳不上去！ -->
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="input-area">
+            <span class="form-label">IDENTIFICATION (CODENAME):</span>
+            {{ form.nickname }}
+            
+            <span class="form-label">INTELLIGENCE REPORT:</span>
+            {{ form.content }}
+            
+            <span class="form-label">ATTACH EVIDENCE (OPTIONAL):</span>
+            {{ form.image }}
+            
+            <button type="submit" class="cs-btn">TRANSMIT DATA</button>
+        </div>
+    </form>
+
+    <!-- 分隔線 -->
+    <div class="list-header">
+        - - - ENCRYPTED TRANSMISSION LOG - - -
+    </div>
+
+    <!-- 留言顯示區 -->
+    <div class="message-list">
+        {% for msg in messages %}
+            <div class="cs-message-box">
+                <!-- 標頭資訊 -->
+                <div>
+                    <span class="cs-name">{{ msg.nickname }}</span>
+                    <span class="cs-time">{{ msg.created_at|date:"Y-m-d H:i:s" }}</span>
+                </div>
+                
+                <!-- 文字內容 -->
+                <p>{{ msg.content }}</p>
+                
+                <!-- 圖片內容 -->
+                {% if msg.image %}
+                    <div class="evidence-box">
+                        <span class="evidence-label">[EVIDENCE FILE #{{ msg.id }}]</span>
+                        <img src="{{ msg.image.url }}">
+                    </div>
+                {% endif %}
+            </div>
+        {% empty %}
+            <div style="text-align: center; color: #8b949e; padding: 20px;">
+                NO INTELLIGENCE REPORTS FOUND. WAITING FOR INPUT...
+            </div>
+        {% endfor %}
+    </div>
+
+</body>
+</html>

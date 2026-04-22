@@ -1,0 +1,101 @@
+{% extends 'shop/base.html' %}
+{% load static %}
+
+{% block title %}情境导购 | 大陆酒店军火库{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="hero-content">
+        <h1 class="hero-title">每一位绅士，都值得一件合身的<span class="accent">“工具”</span></h1>
+        <p class="hero-subtitle">请允许我们向您提问几个问题，以便为您推荐最契合您气质的精品</p>
+    </div>
+</div>
+
+<div class="concierge-section">
+    <div class="concierge-card">
+        <h2>📋 康纳尔基为您服务</h2>
+        <p class="concierge-desc">“请告诉我，您将在<span class="highlight">何时</span>、<span class="highlight">何地</span>、<span class="highlight">何种场合</span>使用？我们会为您挑选最合适的方案。”</p>
+        
+        <form method="GET" class="situation-form" id="situationForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>⏰ 何时使用？</label>
+                    <select name="when" class="elegant-select">
+                        <option value="">— 请选择 —</option>
+                        {% for when in when_options %}
+                        <option value="{{ when }}">{{ when }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>📍 何地使用？</label>
+                    <select name="where" class="elegant-select">
+                        <option value="">— 请选择 —</option>
+                        {% for where in where_options %}
+                        <option value="{{ where }}">{{ where }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>🎭 何种场合？</label>
+                    <select name="occasion" class="elegant-select">
+                        <option value="">— 请选择 —</option>
+                        {% for occasion in occasion_options %}
+                        <option value="{{ occasion }}">{{ occasion }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <button type="submit" class="btn-primary">🔍 为我推荐</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="products-grid">
+    {% for product in products %}
+    <div class="product-card" data-product-id="{{ product.id }}">
+        <div class="product-badge">
+            {% if product.is_limited %}
+            <span class="badge-limited">限量版</span>
+            {% endif %}
+        </div>
+        
+        {% if product.image %}
+        <div class="product-image">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+        </div>
+        {% else %}
+        <div class="product-image-placeholder">
+            <span class="placeholder-icon">⚔️</span>
+        </div>
+        {% endif %}
+        
+        <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-tagline">{{ product.tagline }}</p>
+            
+            <div class="situation-quote">
+                <p class="quote-text">“{{ product.when_to_use }} · {{ product.where_to_use }} · {{ product.occasion_to_use }}”</p>
+            </div>
+            
+            <p class="product-price">${{ product.price }}</p>
+            
+            <div class="product-actions">
+                <a href="{% url 'product_detail' product.slug %}" class="btn-detail">详细了解</a>
+                <button class="btn-add-cart" data-id="{{ product.id }}">加入购物车</button>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="empty-state">
+        <p>🕯️ 抱歉，目前没有符合您情境的商品。</p>
+        <a href="{% url 'shop:product_list' %}" class="btn-primary">浏览全部精品</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
